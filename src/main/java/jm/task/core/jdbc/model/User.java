@@ -21,12 +21,7 @@ public class User {
 
     @Override
     public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", age=" + age +
-                '}';
+        return this.getClass().getSimpleName() + "{id:" + this.id + "name:" + this.name + "lastName:" + this.lastName + "age:" + this.age + "}";
     }
 
     public User() {
