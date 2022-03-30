@@ -1,37 +1,40 @@
 package jm.task.core.jdbc.service;
 
+import jm.task.core.jdbc.dao.UserDaoHibernateImpl;
 import jm.task.core.jdbc.dao.UserDaoJDBCImpl;
 import jm.task.core.jdbc.model.User;
 
+import javax.transaction.Transactional;
 import java.util.List;
-/*класс переиспользует методы класса UserDaoJBCLmpl*/
+/*класс переиспользует методы класса UserDaoHibernateImpl*/
 public class UserServiceImpl implements UserService {
-    UserDaoJDBCImpl userDaoHibernate = new UserDaoJDBCImpl();
+//    UserDaoJDBCImpl sv = new UserDaoJDBCImpl();
+    UserDaoHibernateImpl dao = new UserDaoHibernateImpl();
 
     public UserServiceImpl() {
     }
 
     public void createUsersTable() {
-        userDaoHibernate.createUsersTable();
+        dao.createUsersTable();
     }
 
     public void dropUsersTable() {
-        userDaoHibernate.dropUsersTable();
+        dao.dropUsersTable();
     }
 
     public void saveUser(String name, String lastName, byte age) {
-        this.userDaoHibernate.saveUser(name, lastName, age);
+        dao.saveUser(name, lastName, age);
     }
 
     public void removeUserById(long id) {
-        userDaoHibernate.removeUserById(id);
+        dao.removeUserById(id);
     }
-
+    @Transactional
     public List<User> getAllUsers() {
-        return userDaoHibernate.getAllUsers();
+        return dao.getAllUsers();
     }
 
     public void cleanUsersTable() {
-        userDaoHibernate.cleanUsersTable();
+        dao.cleanUsersTable();
     }
 }

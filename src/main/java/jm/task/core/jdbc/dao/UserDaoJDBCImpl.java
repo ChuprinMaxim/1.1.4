@@ -3,9 +3,7 @@ package jm.task.core.jdbc.dao;
 import jm.task.core.jdbc.model.User;
 import jm.task.core.jdbc.util.Util;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,11 +12,10 @@ public class UserDaoJDBCImpl implements UserDao {
     public UserDaoJDBCImpl() {
     }
 
-    /*чтобы не дублировать коннект в каждом методе*/
-    public void tableConnection(String x) {
-        try (Connection connection = Util.getConnection();
-             Statement statement = connection.createStatement()) {
-             statement.executeUpdate(x);
+    /*чтобы не дублировать запрос в каждом методе*/
+    public void tableQuery(String x) {
+        try (PreparedStatement query = Util.getConnection().prepareStatement(x)) {
+            query.execute();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -26,35 +23,36 @@ public class UserDaoJDBCImpl implements UserDao {
 
     /*создание таблицы*/
     public void createUsersTable() {
-        String createTable = "CREATE TABLE IF NOT EXISTS User (id BIGINT PRIMARY KEY AUTO_INCREMENT, name VARCHAR(45), lastName VARCHAR(45), age INT)";
-        tableConnection(createTable);
+        tableQuery("CREATE TABLE IF NOT EXISTS User (id BIGINT PRIMARY KEY AUTO_INCREMENT, name VARCHAR(45), lastName VARCHAR(45), age INT)");
     }
 
     /*удаление таблицы*/
     public void dropUsersTable() {
-        String dropTable = "DROP TABLE IF EXISTS User";
-        tableConnection(dropTable);
+        tableQuery("DROP TABLE IF EXISTS User");
     }
 
     /*сохранение пользователя*/
     public void saveUser(String name, String lastName, byte age) {
-        String saveUser = "INSERT INTO User (name, lastName, age) VALUES ('" + name + "', '" + lastName + "', " + age + ")";
-        tableConnection(saveUser);
-        System.out.println("User with name - " + name + " added in the database");
+        try (PreparedStatement query = Util.getConnection().prepareStatement("INSERT INTO User (name, lastName, age) VALUES (?, ?, ?)")) {
+            query.setString(1, name);
+            query.setString(2, lastName);
+            query.setInt(3, age);
+            query.execute();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /*удаление пользователя по id*/
     public void removeUserById(long id) {
-        String removeUser = "DELETE From User WHERE id=" + id;
-        tableConnection(removeUser);
+        tableQuery("DELETE From User WHERE id=" + id);
     }
 
     /*вывод в консоль всех пользователей*/
     public List<User> getAllUsers() {
         List<User> list = new ArrayList<>();
-        try (Connection connection = Util.getConnection();
-             Statement statement = connection.createStatement()) {
-             ResultSet resultSet = statement.executeQuery("select * from user");
+        try (PreparedStatement query = Util.getConnection().prepareStatement("select * from user")) {
+            ResultSet resultSet = query.executeQuery();
             while (resultSet.next()) {
                 User user = new User();
                 user.setId(resultSet.getLong("id"));
@@ -72,7 +70,6 @@ public class UserDaoJDBCImpl implements UserDao {
 
     /*стереть таблицу*/
     public void cleanUsersTable() {
-        String cleanTable = "TRUNCATE TABLE User";
-        tableConnection(cleanTable);
+        tableQuery("TRUNCATE TABLE User");
     }
 }
