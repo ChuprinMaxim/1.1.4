@@ -1,15 +1,12 @@
 package jm.task.core.jdbc.service;
 
+import jm.task.core.jdbc.dao.UserDao;
 import jm.task.core.jdbc.dao.UserDaoHibernateImpl;
-import jm.task.core.jdbc.dao.UserDaoJDBCImpl;
 import jm.task.core.jdbc.model.User;
-
-import javax.transaction.Transactional;
 import java.util.List;
-/*класс переиспользует методы класса UserDaoHibernateImpl*/
+
 public class UserServiceImpl implements UserService {
-//    UserDaoJDBCImpl sv = new UserDaoJDBCImpl();
-    UserDaoHibernateImpl dao = new UserDaoHibernateImpl();
+    UserDao dao = new UserDaoHibernateImpl();
 
     public UserServiceImpl() {
     }
@@ -29,7 +26,7 @@ public class UserServiceImpl implements UserService {
     public void removeUserById(long id) {
         dao.removeUserById(id);
     }
-    @Transactional
+
     public List<User> getAllUsers() {
         return dao.getAllUsers();
     }

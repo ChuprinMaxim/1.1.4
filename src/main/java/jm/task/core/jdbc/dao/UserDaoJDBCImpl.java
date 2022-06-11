@@ -3,7 +3,8 @@ package jm.task.core.jdbc.dao;
 import jm.task.core.jdbc.model.User;
 import jm.task.core.jdbc.util.Util;
 
-import java.sql.*;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,7 +29,11 @@ public class UserDaoJDBCImpl implements UserDao {
 
     /*удаление таблицы*/
     public void dropUsersTable() {
-        tableQuery("DROP TABLE IF EXISTS User");
+        try (PreparedStatement query = Util.getConnection().prepareStatement(String.format("DROP TABLE IF EXISTS %s", "User"))) {
+            query.execute();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /*сохранение пользователя*/
@@ -45,13 +50,13 @@ public class UserDaoJDBCImpl implements UserDao {
 
     /*удаление пользователя по id*/
     public void removeUserById(long id) {
-        tableQuery("DELETE From User WHERE id=" + id);
+        tableQuery("DELETE FROM User WHERE id=" + id);
     }
 
     /*вывод в консоль всех пользователей*/
     public List<User> getAllUsers() {
         List<User> list = new ArrayList<>();
-        try (PreparedStatement query = Util.getConnection().prepareStatement("select * from user")) {
+        try (PreparedStatement query = Util.getConnection().prepareStatement("SELECT * FROM user")) {
             ResultSet resultSet = query.executeQuery();
             while (resultSet.next()) {
                 User user = new User();
